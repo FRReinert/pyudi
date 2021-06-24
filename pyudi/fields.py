@@ -10,11 +10,14 @@ class Field:
     def __init__(self):
         raise NotImplementedError('Do not use this field directly')
 
-    agency: str
     data_delimiter: str
     data_size: int
     agency: str
     name: str
+
+    @property
+    def re(self):
+        raise NotImplementedError('You need to override this property before using')
 
 
 class AlphanumericField(Field):
