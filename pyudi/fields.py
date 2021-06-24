@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractproperty
+from abc import ABCMeta, abstractmethod
 
 __all__ = [
     'GTINField', 'ContentField', 'BatchLotField', 'ProductionDateField', 'ExpiringDateField', 
@@ -15,17 +15,19 @@ class IField(metaclass=ABCMeta):
     agency: str
     name: str
 
-    @abstractproperty
-    def re(self):
+    @property
+    @abstractmethod
+    def regex(self):
         '''Return a valid Regular Expression'''
+        return NotImplemented
 
 
 class AlphanumericField(IField):
     '''Base Alphanumeric Field'''
 
     @property
-    def re(self):
-        return fr'^{self.data_delimiter}([\x21-\x22\x25-\x2F\x30-\x39\x3A-\x3F\x41-\x5A\x5F\x61-\x7A]{0,{self.data_size}})$'
+    def regex(self):
+        return fr'^{self.data_delimiter}([\x21-\x22\x25-\x2F\x30-\x39\x3A-\x3F\x41-\x5A\x5F\x61-\x7A]{{0,{self.data_size}}})$'
 
 
 class DateField(IField):
@@ -33,20 +35,21 @@ class DateField(IField):
 
     # TODO: Verify other Patterns beyond GS1. 
     # - Verify if all of them use 6 digits
-    # - Verify if all of them use the same date format
+    # - Verify if all of them use the same date format (YYMMDD)
     data_size = 6
 
     @property
-    def re(self):
-        return fr'^{self.data_delimiter}(\d{self.data_size})$'
+    @abstractmethod
+    def regex(self):
+        return fr'^{self.data_delimiter}(\d{{{self.data_size}}})$'
 
 
 class NumericField(IField):
     '''Base Numeric Field'''
 
     @property
-    def re(self):
-        return fr'^{self.data_delimiter}(\d{{self.data_size}})$'
+    def regex(self):
+        return fr'^{self.data_delimiter}(\d{{{self.data_size}}})$'
 
 
 class SSCCField(NumericField):
