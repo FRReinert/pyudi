@@ -8,6 +8,8 @@ Status: Not ready for production
 
 This library is designed support UDI patterns and standards in python projects as agnostic as possible. Meaning you can use it with a framework, script, modules or even another library.
 
+GS1 Reference: https://www.gs1.org/standards/barcodes/application-identifiers?lang=en
+
 # Usage
 
 We are planning to publish it when when it become production ready. Until there, you can clone it and start playing arround with the library.
