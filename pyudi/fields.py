@@ -1,26 +1,24 @@
 from dataclasses import dataclass
+from abc import ABCMeta, abstractproperty
 
 __all__ = ['DIField', 'ProductionDateField', 'ExpirationDateField', 'LotField', 'SerialField']
 
 
 @dataclass
-class Field:
+class IField(metaclass=ABCMeta):
     '''Base data types for GS1 labels'''
-
-    def __init__(self):
-        raise NotImplementedError('Do not use this field directly')
 
     data_delimiter: str
     data_size: int
     agency: str
     name: str
 
-    @property
+    @abstractproperty
     def re(self):
-        raise NotImplementedError('You need to override this property before using')
+        '''Return a valid Regular Expression'''
 
 
-class AlphanumericField(Field):
+class AlphanumericField(IField):
     '''Base Alphanumeric Field'''
 
     @property
@@ -28,7 +26,7 @@ class AlphanumericField(Field):
         return fr'^{self.data_delimiter}([\x21-\x22\x25-\x2F\x30-\x39\x3A-\x3F\x41-\x5A\x5F\x61-\x7A]{0,{self.data_size}})$'
 
 
-class DateField(Field):
+class DateField(IField):
     '''Base Date Field'''
 
     data_size = 6
@@ -38,7 +36,7 @@ class DateField(Field):
         return fr'^{self.data_delimiter}(\d{self.data_size})$'
 
 
-class NumericField(Field):
+class NumericField(IField):
     '''Base Numeric Field'''
 
     @property
