@@ -1,10 +1,12 @@
-from dataclasses import dataclass
 from abc import ABCMeta, abstractproperty
 
-__all__ = ['DIField', 'ProductionDateField', 'ExpirationDateField', 'LotField', 'SerialField']
+__all__ = [
+    'GTINField', 'ContentField', 'BatchLotField', 'ProductionDateField', 'ExpiringDateField', 
+    'PackingDateField', 'MinimalExpiringField', 'SellExpiringField', 'MaxExpiringDateField', 
+    'MaxExpiringDateField', 'SerialNumberField', 'ConsumerProductVariantField'
+]
 
 
-@dataclass
 class IField(metaclass=ABCMeta):
     '''Base data types for GS1 labels'''
 
@@ -29,6 +31,9 @@ class AlphanumericField(IField):
 class DateField(IField):
     '''Base Date Field'''
 
+    # TODO: Verify other Patterns beyond GS1. 
+    # - Verify if all of them use 6 digits
+    # - Verify if all of them use the same date format
     data_size = 6
 
     @property
@@ -46,6 +51,7 @@ class NumericField(IField):
 
 class SSCCField(NumericField):
     '''00 Serial Shipping Container Code (SSCC)'''
+
     agency = 'GS1'
     name = 'SSCC'
     data_delimiter = '00'
@@ -54,6 +60,7 @@ class SSCCField(NumericField):
 
 class GTINField(NumericField):
     '''01 Global Trade Item Number (GTIN)'''
+
     agency = 'GS1'
     name = 'GTIN'
     data_delimiter = '01'
@@ -62,6 +69,7 @@ class GTINField(NumericField):
 
 class ContentField(NumericField):
     '''02 Global Trade Item Number (GTIN) of contained trade items'''
+
     content = 'CONTENT'
     data_delimiter = '02'
     data_size = 14
@@ -69,6 +77,7 @@ class ContentField(NumericField):
 
 class BatchLotField(AlphanumericField):
     '''10 Batch or lot number'''
+
     agency = 'GS1'
     name = 'BATCH/LOT'
     data_delimiter = '10'
@@ -77,6 +86,7 @@ class BatchLotField(AlphanumericField):
 
 class ProductionDateField(DateField):
     '''11 Production date (YYMMDD)'''
+
     agency = 'GS1'
     name = 'PROD DATE'
     data_delimiter = '11'
@@ -84,6 +94,7 @@ class ProductionDateField(DateField):
 
 class ExpiringDateField(DateField):
     '''12 Due date (YYMMDD)'''
+
     agency = 'GS1'
     name = 'DUE DATE'
     data_delimiter = '12'
@@ -91,6 +102,7 @@ class ExpiringDateField(DateField):
 
 class PackingDateField(DateField):
     '''13 Packaging date (YYMMDD)'''
+
     agency = 'GS1'
     name = 'PACK DATE'
     data_delimiter = '13'
@@ -98,6 +110,7 @@ class PackingDateField(DateField):
 
 class MinimalExpiringField(DateField):
     '''15 Best before date (YYMMDD)'''
+
     agency = 'GS1'
     name = 'BEST BEFORE or BEST BY'
     data_delimiter = '15'
@@ -105,6 +118,7 @@ class MinimalExpiringField(DateField):
 
 class SellExpiringField(DateField):
     '''16 Sell by date (YYMMDD)'''
+
     agency = 'GS1'
     name = 'SELL BY'
     data_delimiter = '16'
@@ -112,6 +126,7 @@ class SellExpiringField(DateField):
 
 class MaxExpiringDateField(DateField):
     '''17 Expiration date (YYMMDD)'''
+
     agency = 'GS1'
     name = 'USE BY OR EXPIRY'
     data_delimiter = '17'
@@ -119,6 +134,7 @@ class MaxExpiringDateField(DateField):
 
 class MaxExpiringDateField(NumericField):
     '''20 Internal product variant'''
+
     agency = 'GS1'
     name = 'VARIANT'
     data_delimiter = '20'
@@ -127,13 +143,16 @@ class MaxExpiringDateField(NumericField):
 
 class SerialNumberField(AlphanumericField):
     '''21 Serial number'''
+
     agency = 'GS1'
     name = 'SERIAL'
     data_delimiter = '21'
     data_size = 20
 
+
 class ConsumerProductVariantField(AlphanumericField):
     '''21 Serial number'''
+
     agency = 'GS1'
     name = 'CPV'
     data_delimiter = '22'
