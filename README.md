@@ -10,10 +10,9 @@ This library is designed support UDI patterns and standards in python projects a
 
 # Usage
 
-We are planning to post it pypi when it's ready for production. Until there, you can clone it and start playing arround with the library.
+We are planning to publish it when when it become production ready. Until there, you can clone it and start playing arround with the library.
 
 # Goals
-
 
 * Serialization
 
