@@ -19,7 +19,7 @@ class GS1AlphanumericField(IField):
 
     @property
     def regex(self):
-        return fr'^{self.data_delimiter}([\x21-\x22\x25-\x2F\x30-\x39\x3A-\x3F\x41-\x5A\x5F\x61-\x7A]{{0,{self.data_size}}})$'
+        return fr'{self.data_delimiter}([\x21-\x22\x25-\x2F\x30-\x39\x3A-\x3F\x41-\x5A\x5F\x61-\x7A]{{0,{self.data_size}}})$'
 
 
 class GS1DateField(IField):
@@ -27,7 +27,7 @@ class GS1DateField(IField):
 
     @property
     def regex(self):
-        return fr'^{self.data_delimiter}(\d{{{self.data_size}}})$'
+        return fr'{self.data_delimiter}(\d{{{self.data_size}}})$'
 
 
 class GS1NumericField(IField):
@@ -35,4 +35,4 @@ class GS1NumericField(IField):
 
     @property
     def regex(self):
-        return fr'^{self.data_delimiter}(\d{{{self.data_size}}})$'
+        return fr'{self.data_delimiter}(\d{{{self.data_size}}})$'
