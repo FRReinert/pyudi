@@ -1,3 +1,8 @@
+'''
+    This file contain the base abstract class to implement all agencies UDI
+    - Do not implement anything that is intrinsict of a single Agency such as GS1
+    - If there is a property, attr or method that any agency can make use, make it mandatory using the ABS lib  
+'''
 from typing import Any, Generator, List
 from inspect import getmembers
 from abc import ABCMeta, abstractmethod, abstractproperty
