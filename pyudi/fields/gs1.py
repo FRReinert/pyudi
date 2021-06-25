@@ -1,3 +1,12 @@
+'''
+This file contains the GS1 fields declaration
+
+    TODO:
+    - Verify with GS1 what is the sequence of fields to be evaluated and ask for a oficial document to be referenced here
+    - Without a proper sequence a field can be matched at any point of the code
+    - Example sequence: 00xxxx01xxxx10xxx11xxx17xxx(...)
+'''
+
 from pyudi.fields.base import GS1AlphanumericField, GS1DateField, GS1NumericField
 
 
