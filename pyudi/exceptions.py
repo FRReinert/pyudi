@@ -1,3 +1,3 @@
-class DatefieldError(Exception):
+class InvalidDateException(Exception):
     '''Invalid Date field Exception'''
     pass
