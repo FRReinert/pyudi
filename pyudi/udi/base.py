@@ -6,6 +6,8 @@
 from typing import Any, Generator, List
 from inspect import getmembers
 from abc import ABCMeta, abstractmethod, abstractproperty
+from enum import Enum
+
 
 class IBaseUDI(metaclass=ABCMeta):
     '''
@@ -64,3 +66,10 @@ class IBaseUDI(metaclass=ABCMeta):
         '''Return a list of field classes for the specific agency'''
         for field_class in getattr(agency_field_module, '__fields'):
             yield field_class
+
+
+class Code(Enum):
+    '''Used to verify what decode should be used'''
+
+    UDI_CODE = 1
+    HUMAN_CODE = 2
