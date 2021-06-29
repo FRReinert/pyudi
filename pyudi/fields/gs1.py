@@ -7,7 +7,31 @@ This file contains the GS1 fields declaration
     - Example sequence: 00xxxx01xxxx10xxx11xxx17xxx(...)
 '''
 
-from pyudi.fields.base import GS1AlphanumericField, GS1DateField, GS1NumericField
+from pyudi.fields.base import IField
+
+
+class GS1AlphanumericField(IField):
+    '''Base GS1 Alphanumeric Field'''
+
+    @classmethod
+    def regex(cls):
+        return r'^%s([\x21-\x22\x25-\x2F\x30-\x39\x3A-\x3F\x41-\x5A\x5F\x61-\x7A]{0,%s})' % (cls.data_delimiter, cls.data_size)
+
+
+class GS1DateField(IField):
+    '''Base GS1 Date Field'''
+
+    @classmethod
+    def regex(cls):
+        return r'^%s(\d{%s})' % (cls.data_delimiter, cls.data_size)
+
+
+class GS1NumericField(IField):
+    '''Base GS1 Numeric Field'''
+
+    @classmethod
+    def regex(cls):
+        return r'^%s(\d{%s})' % (cls.data_delimiter, cls.data_size)
 
 
 class SSCCField(GS1NumericField):
@@ -113,8 +137,9 @@ class ConsumerProductVariantField(GS1AlphanumericField):
     data_delimiter = '22'
     data_size = 20
 
+
 __fields = (
-    SSCCField, GTINField, ContentField, BatchLotField, ProductionDateField, ExpiringDateField, 
-    PackingDateField, MinimalExpiringField, SellExpiringField, MaxExpiringDateField, 
+    SSCCField, GTINField, ContentField, BatchLotField, ProductionDateField, ExpiringDateField,
+    PackingDateField, MinimalExpiringField, SellExpiringField, MaxExpiringDateField,
     InternalProductVariantField, SerialNumberField, ConsumerProductVariantField
 )

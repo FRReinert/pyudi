@@ -1,14 +1,7 @@
-from pyudi.udi.base import IBaseUDI
+from typing import Generator
+from pyudi.udi.base import IBaseUDI, Code
 from pyudi.fields import gs1
-from enum import Enum
 from re import match
-
-
-class Code(Enum):
-    '''Used to verify what decode should be used'''
-
-    BAR_CODE = 1
-    HUMAN_CODE = 2
 
 
 class GS1Pattern(IBaseUDI):
@@ -17,28 +10,34 @@ class GS1Pattern(IBaseUDI):
     encoded_udi_string = ''
     human_readable_udi_string = ''
 
-    def __init__(self, barcode: str):
-        self.decode_udi(barcode)
+    def __init__(self, database_field: str):
+        self.decode_udi(database_field)
 
-    def decode_udi(self, barcode: str) -> None:
-        '''
-        Decode data from barcode string to py
-            NOT WORKING - SEE MY COMMENTS AT field_list IMPLEMENTATION
-        '''
-        encoded_str = barcode
+    def decode_udi(self, database_field: str) -> None:
+        '''Decode data from barcode string to py'''
+        for field, value in self.field_lookup(database_field):
+            self.parse_field_to_attribute(field, value)
+
+    def field_lookup(self, database_field: str) -> Generator:
+        '''Look for fields within UDI code'''
+
+        # TODO: Make it loops <database_field> instead of <field_list>
+        encoded_str = database_field
         for field in self.field_list(gs1):
 
             re_result = match(field.regex(), encoded_str)
             if re_result:
 
-                # Add the found field to the instance
-                setattr(self, field.name, field(re_result[1]))
-
-                # Remove the found string fron barcode
+                # Remove the found string from barcode
                 encoded_str = encoded_str.split(re_result[1])[1]
+                yield field, re_result[1]
+
+    def parse_field_to_attribute(self, field, field_value):
+        '''Add the found field to the instance'''
+        setattr(self, field.name, field(field_value))
 
     def encode_udi(self, to_code: Code = 1) -> str:
-        '''Decode obj to BAR_CODE/HUMAN_CODE string. Default is BAR_CODE'''
+        '''Decode obj to UDI_CODE/HUMAN_CODE string. Default is UDI_CODE'''
 
         for _ in self.get_fields():
 

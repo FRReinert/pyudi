@@ -6,13 +6,14 @@
 
 from abc import ABCMeta, abstractclassmethod
 
+
 class IField(metaclass=ABCMeta):
     '''Base interface for any agency Field'''
 
     data_delimiter: str
     data_size: int
     agency: str
-    value:str
+    value: str
     name: str
 
     @classmethod
@@ -25,27 +26,3 @@ class IField(metaclass=ABCMeta):
 
     def __str__(self):
         return self.value
-
-
-class GS1AlphanumericField(IField):
-    '''Base GS1 Alphanumeric Field'''
-
-    @classmethod
-    def regex(cls):
-        return r'%s([\x21-\x22\x25-\x2F\x30-\x39\x3A-\x3F\x41-\x5A\x5F\x61-\x7A]{0,%s})' % (cls.data_delimiter, cls.data_size)
-
-
-class GS1DateField(IField):
-    '''Base GS1 Date Field'''
-
-    @classmethod
-    def regex(cls):
-        return r'%s(\d{%s})' % (cls.data_delimiter, cls.data_size)
-
-
-class GS1NumericField(IField):
-    '''Base GS1 Numeric Field'''
-
-    @classmethod
-    def regex(cls):
-        return r'%s(\d{%s})' % (cls.data_delimiter, cls.data_size)
