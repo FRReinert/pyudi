@@ -4,11 +4,27 @@
     - IField must be enough abstract to implement all possible agencies
 '''
 
-from abc import ABCMeta, abstractclassmethod
+from abc import ABC, abstractclassmethod, abstractproperty
+from typing import Generator, Tuple
 
 
-class IField(metaclass=ABCMeta):
-    '''Base interface for any agency Field'''
+class IFieldFactory(ABC):
+    '''Factory Interface to crete Fields'''
+
+    @property
+    @abstractproperty
+    def __FIELDS() -> Tuple:
+        '''Contain a list of all agency field classes'''
+        pass
+
+    @classmethod
+    def create_field(cls, database_field: str) -> Generator:
+        '''Create fields on the fly'''
+        pass
+
+
+class IField(ABC):
+    '''Field Interface'''
 
     data_delimiter: str
     data_size: int
@@ -20,9 +36,7 @@ class IField(metaclass=ABCMeta):
     @abstractclassmethod
     def regex(self):
         '''Regex Interface implementation'''
-
-    def __init__(self, value):
-        self.value = value
+        pass
 
     def __str__(self):
         return self.value
