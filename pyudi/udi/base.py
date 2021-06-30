@@ -3,73 +3,49 @@
     - Do not implement anything that is intrinsict of a single Agency such as GS1
     - If there is a property, attr or method that any agency can make use, make it mandatory using the ABS lib  
 '''
-from typing import Any, Generator, List
 from inspect import getmembers
-from abc import ABCMeta, abstractmethod, abstractproperty
-from enum import Enum
+from typing import Generator, List
 
 
-class IBaseUDI(metaclass=ABCMeta):
-    '''
-    Base class for UDI implementation
-    - Add _field<CUSTOM_NAME_OF_THE_FIELD> as the attribute with an field instance
-        ex: _field_SerialField = field.SerialNumberField() 
-    '''
+class BaseUDI:
+    '''Base class for UDI implementation instance'''
 
-    @abstractmethod
-    def __init__(self):
-        '''Interface Validate Field'''
+    __iter_collection: List = []
+    __iter_pos: int = 0
 
-    @property
-    @abstractproperty
-    def human_readable_udi_string(self) -> str:
-        '''Interface attribute for UDI String'''
+    def __iter__(self):
+        self.__iter_collection = [field for field in self.get_fields()]
+        return self
 
-    @property
-    @abstractproperty
-    def encoded_udi_string(self) -> str:
-        '''Interface attribute for encoded UDI String'''
+    def __next__(self):
+        pos: int = self.__iter_pos
+        if self.__iter_pos < len(self.__iter_collection):
+            self.__iter_pos += 1
+            return self.__iter_collection[pos]
+        else:
+            self.__iter_pos = 0
+            raise StopIteration
 
-    @abstractmethod
-    def encode_udi(self) -> None:
-        '''Interface method to encode UDI from string'''
-
-    @abstractmethod
-    def decode_udi(self) -> None:
-        '''Interface method to decode UDI from instance'''
-
-    def __length__(self) -> int:
+    def __len__(self) -> int:
         '''Return UDI characters sum'''
-        return len(str(self))
+        length: int = 0
+        for field in self.get_fields():
+            length += len(field.value)
+        return length
 
     def __str__(self) -> str:
         '''Return printable UDI characters'''
-        printable_str = ''
-        for field in self.fields:
-            printable_str += str(field)
-        return printable_str
+        fields = []
+        for field in self.get_fields():
+            fields.append(f"{field.name}: {field.value}")
+        return ", ".join(fields)
 
     def is_valid(self) -> bool:
-        '''Is the UDI valid'''
-        return False
+        '''Validate UDI'''
+        return NotImplemented
 
-    def get_fields(self) -> List:
-        '''return a list of fields'''
-        result = []
-        for member in getmembers(self):
-            if member.starts_with('field_'):
-                result.append(member)
-        return result
-
-    @staticmethod
-    def field_list(agency_field_module: Any) -> Generator:
-        '''Return a list of field classes for the specific agency'''
-        for field_class in getattr(agency_field_module, '__fields'):
-            yield field_class
-
-
-class Code(Enum):
-    '''Used to verify what decode should be used'''
-
-    UDI_CODE = 1
-    HUMAN_CODE = 2
+    def get_fields(self) -> Generator:
+        '''return a field generator'''
+        for name, val in getmembers(self):
+            if name.startswith('field_'):
+                yield getattr(self, name)
