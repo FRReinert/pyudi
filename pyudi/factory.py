@@ -13,6 +13,12 @@ class FactoryUDI:
         if agency == Agency.GS1:
             instance = StructureGS1()
             StructureGS1.fieldset = GS1Fieldset(**kwargs)
+        
+        elif agency == Agency.HIBCC:
+            raise NotImplementedError
+        
+        elif agency == Agency.ICCBBA:
+            raise NotImplementedError
 
         return instance
 
@@ -22,6 +28,12 @@ class FactoryUDI:
 
         if agency == Agency.GS1:
             structure = StructureGS1()
+        
+        elif agency == Agency.HIBCC:
+            raise NotImplementedError
+        
+        elif agency == Agency.ICCBBA:
+            raise NotImplementedError
        
         structure.fieldset.parse(database_str=database_field)
         
