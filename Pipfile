@@ -1,11 +1,7 @@
-[[source]]
-url = "https://pypi.org/pyudi"
-verify_ssl = true
-name = "pyudi"
-
 [packages]
 
 [dev-packages]
+coverage = "*"
 
 [requires]
 python_version = "3.9"
