@@ -183,22 +183,41 @@ class ConsumerProductVariantField(GS1AlphanumericField):
 class GS1Fieldset(IFieldset):
     '''Represent a container with GS1 Fields'''
 
-    SSCCField: Optional[SSCCField]
-    GTINField: Optional[GTINField]
-    ContentField: Optional[ContentField]
-    BatchLotField: Optional[BatchLotField]
-    ProductionDateField: Optional[ProductionDateField]
-    ExpiringDateField: Optional[ExpiringDateField]
-    PackingDateField: Optional[PackingDateField]
-    MinimalExpiringField: Optional[MinimalExpiringField]
-    SellExpiringField: Optional[SellExpiringField]
-    MaxExpiringDateField: Optional[MaxExpiringDateField]
-    InternalProductVariantField: Optional[InternalProductVariantField]
-    SerialNumberField: Optional[SerialNumberField]
-    ConsumerProductVariantField: Optional[ConsumerProductVariantField]
+    SSCCField: SSCCField = None
+    GTINField: GTINField = None
+    ContentField: ContentField = None
+    BatchLotField: BatchLotField = None
+    ProductionDateField: ProductionDateField = None
+    ExpiringDateField: ExpiringDateField = None
+    PackingDateField: PackingDateField = None
+    MinimalExpiringField: MinimalExpiringField = None
+    SellExpiringField: SellExpiringField = None
+    MaxExpiringDateField: MaxExpiringDateField = None
+    InternalProductVariantField: InternalProductVariantField = None
+    SerialNumberField: SerialNumberField = None
+    ConsumerProductVariantField: ConsumerProductVariantField = None
+
+    __fieldset__: list[str] = [
+        'SSCCField', 'GTINField', 'ContentField', 'BatchLotField', 'ProductionDateField', 
+        'ExpiringDateField', 'PackingDateField', 'MinimalExpiringField', 'SellExpiringField', 
+        'MaxExpiringDateField', 'InternalProductVariantField', 'SerialNumberField', 'ConsumerProductVariantField'
+    ]
 
     def parse(self, database_str: str) -> None:
-        return super().parse(database_str)
+        '''Waiting for more information from GS1 on how to parse'''
+        pass
 
-    def serialize(self) -> str:
-        return super().serialize()
+    def serialize(self, human_readable=False) -> str:
+        '''Transform fields in UDI code. Human readable will make it formated'''
+        
+        udi = ''
+
+        if human_readable:
+            for field in self.get_fields(show_empty=False):
+                udi += '(' + field.data_delimeter + ')' + field.value
+        
+        else:
+            for field in self.get_fields(show_empty=False):
+                udi += field.data_delimiter + field.value
+
+        return udi
