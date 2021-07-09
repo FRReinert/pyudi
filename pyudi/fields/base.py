@@ -1,12 +1,12 @@
 '''Field Factory'''
 
-from abc import ABC, abstractclassmethod
-from pyudi.udi.base import Agency
+from abc import ABCMeta, abstractclassmethod, abstractmethod
+from pyudi.common import Agency
 
 __all__ = ['FieldFactoryGs1']
 
 
-class IField(ABC):
+class IField(metaclass=ABCMeta):
     '''Field Interface'''
 
     data_delimiter: str
@@ -23,3 +23,16 @@ class IField(ABC):
 
     def __str__(self):
         return self.value
+
+
+class IFieldset(metaclass=ABCMeta):
+    '''Interface Fieldset to wrap all fields'''
+
+    @abstractmethod
+    def parse(self, database_str: str) -> None:
+        '''From UDI code to instance fields'''
+        pass
+
+    @abstractmethod
+    def serialize(self) -> str:
+        '''Instance fields  to UDI code'''
