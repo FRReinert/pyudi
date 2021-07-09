@@ -3,12 +3,9 @@
     - Do not implement anything that is intrinsict of a single Agency such as GS1
     - If there is a property, attr or method that any agency can make use, make it mandatory using the ABS lib  
 '''
-from abc import ABCMeta, abstractclassmethod
-from inspect import getmembers
-from typing import Generator
 
 
-class IStructureUDI(metaclass=ABCMeta):
+class IStructureUDI:
     '''Base class for UDI implementation instance'''
 
     __iter_collection: list = []
@@ -40,14 +37,3 @@ class IStructureUDI(metaclass=ABCMeta):
         for field in self.get_fields():
             fields.append(f"{field.name}: {field.value}")
         return ", ".join(fields)
-
-    def get_fields(self) -> Generator:
-        '''return a field generator'''
-        for name, val in getmembers(self):
-            if name.startswith('f_'):
-                yield getattr(self, name)
-
-    @abstractclassmethod
-    def parse(self, database_str: str) -> None:
-        '''Parse <database_str> to class fields'''
-        pass

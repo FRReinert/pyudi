@@ -1,7 +1,9 @@
 '''GS1 fields implementation'''
 
+from dataclasses import dataclass
 from pyudi.common import Agency
-from pyudi.fields.base import IField
+from pyudi.fields.base import IField, IFieldset
+from typing import Optional
 
 
 __all__ = ['SSCCField', 'GTINField', 'ContentField', 'BatchLotField', 'ProductionDateField', 'ExpiringDateField',
@@ -64,7 +66,7 @@ class SSCCField(GS1NumericField):
     '''00 Serial Shipping Container Code (SSCC)'''
 
     agency: Agency = Agency.GS1
-    name = 'field_SSCC'
+    name = 'SSCC'
     data_delimiter = '00'
     data_size = 18
 
@@ -73,7 +75,7 @@ class GTINField(GS1NumericField):
     '''01 Global Trade Item Number (GTIN)'''
 
     agency: Agency = Agency.GS1
-    name = 'field_GTIN'
+    name = 'GTIN'
     data_delimiter = '01'
     data_size = 14
 
@@ -82,7 +84,7 @@ class ContentField(GS1NumericField):
     '''02 Global Trade Item Number (GTIN) of contained trade items'''
 
     agency: Agency = Agency.GS1
-    name = 'field_CONTENT'
+    name = 'CONTENT'
     data_delimiter = '02'
     data_size = 14
 
@@ -91,7 +93,7 @@ class BatchLotField(GS1AlphanumericField):
     '''10 Batch or lot number'''
 
     agency: Agency = Agency.GS1
-    name = 'field_BATCH_LOT'
+    name = 'BATCH_LOT'
     data_delimiter = '10'
     data_size = 20
 
@@ -100,7 +102,7 @@ class ProductionDateField(GS1DateField):
     '''11 Production date (YYMMDD)'''
 
     agency: Agency = Agency.GS1
-    name = 'field_PROD_DATE'
+    name = 'PROD_DATE'
     data_delimiter = '11'
     data_size = 6
 
@@ -109,7 +111,7 @@ class ExpiringDateField(GS1DateField):
     '''12 Due date (YYMMDD)'''
 
     agency: Agency = Agency.GS1
-    name = 'field_DUE_DATE'
+    name = 'DUE_DATE'
     data_delimiter = '12'
     data_size = 6
 
@@ -118,7 +120,7 @@ class PackingDateField(GS1DateField):
     '''13 Packaging date (YYMMDD)'''
 
     agency: Agency = Agency.GS1
-    name = 'field_PACK_DATE'
+    name = 'PACK_DATE'
     data_delimiter = '13'
     data_size = 6
 
@@ -127,7 +129,7 @@ class MinimalExpiringField(GS1DateField):
     '''15 Best before date (YYMMDD)'''
 
     agency: Agency = Agency.GS1
-    name = 'field_BEST_BEFORE_OR_BEST_BY'
+    name = 'BEST_BEFORE_OR_BEST_BY'
     data_delimiter = '15'
     data_size = 6
 
@@ -136,7 +138,7 @@ class SellExpiringField(GS1DateField):
     '''16 Sell by date (YYMMDD)'''
 
     agency: Agency = Agency.GS1
-    name = 'field_SELL_BY'
+    name = 'SELL_BY'
     data_delimiter = '16'
     data_size = 6
 
@@ -145,7 +147,7 @@ class MaxExpiringDateField(GS1DateField):
     '''17 Expiration date (YYMMDD)'''
 
     agency: Agency = Agency.GS1
-    name = 'field_USE_BY_OR_EXPIRY'
+    name = 'USE_BY_OR_EXPIRY'
     data_delimiter = '17'
     data_size = 6
 
@@ -154,7 +156,7 @@ class InternalProductVariantField(GS1NumericField):
     '''20 Internal product variant'''
 
     agency: Agency = Agency.GS1
-    name = 'field_VARIANT'
+    name = 'VARIANT'
     data_delimiter = '20'
     data_size = 2
 
@@ -163,7 +165,7 @@ class SerialNumberField(GS1AlphanumericField):
     '''21 Serial number'''
 
     agency: Agency = Agency.GS1
-    name = 'field_SERIAL'
+    name = 'SERIAL'
     data_delimiter = '21'
     data_size = 20
 
@@ -172,6 +174,31 @@ class ConsumerProductVariantField(GS1AlphanumericField):
     '''21 Serial number'''
 
     agency: Agency = Agency.GS1
-    name = 'field_CPV'
+    name = 'CPV'
     data_delimiter = '22'
     data_size = 20
+
+
+@dataclass
+class GS1Fieldset(IFieldset):
+    '''Represent a container with GS1 Fields'''
+
+    SSCCField: Optional[SSCCField]
+    GTINField: Optional[GTINField]
+    ContentField: Optional[ContentField]
+    BatchLotField: Optional[BatchLotField]
+    ProductionDateField: Optional[ProductionDateField]
+    ExpiringDateField: Optional[ExpiringDateField]
+    PackingDateField: Optional[PackingDateField]
+    MinimalExpiringField: Optional[MinimalExpiringField]
+    SellExpiringField: Optional[SellExpiringField]
+    MaxExpiringDateField: Optional[MaxExpiringDateField]
+    InternalProductVariantField: Optional[InternalProductVariantField]
+    SerialNumberField: Optional[SerialNumberField]
+    ConsumerProductVariantField: Optional[ConsumerProductVariantField]
+
+    def parse(self, database_str: str) -> None:
+        return super().parse(database_str)
+
+    def serialize(self) -> str:
+        return super().serialize()
