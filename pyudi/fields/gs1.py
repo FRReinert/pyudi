@@ -1,15 +1,14 @@
 '''GS1 fields implementation'''
 
-from dataclasses import dataclass
-from pyudi.common import Agency
-from pyudi.fields.base import IField, IFieldset
-from typing import Optional
+import re
+from typing import Generator
 
+from pyudi.common import Agency, Identifiers
+from pyudi.fields.base import IField, IFieldset, IParser
 
 __all__ = ['SSCCField', 'GTINField', 'ContentField', 'BatchLotField', 'ProductionDateField', 'ExpiringDateField',
            'PackingDateField', 'MinimalExpiringField', 'SellExpiringField', 'MaxExpiringDateField',
-           'InternalProductVariantField', 'SerialNumberField', 'ConsumerProductVariantField']
-
+           'InternalProductVariantField', 'SerialNumberField', 'ConsumerProductVariantField', 'GS1Fieldset']
 
 '''
     Generic GS1 Fields
@@ -19,25 +18,20 @@ __all__ = ['SSCCField', 'GTINField', 'ContentField', 'BatchLotField', 'Productio
 class GS1AlphanumericField(IField):
     '''Base GS1 Alphanumeric Field'''
 
-    def __init__(self, agency: Agency, value: str) -> None:
-        self.agency = agency
+    def __init__(self, value: str = None) -> None:
+        self.agency = Agency.GS1
         self.value = value
 
     @classmethod
     def regex(cls):
-        '''
-        TODO: 
-            - flexible amount of chars will only work if there is any special delimiter character (Which it doesnt have)
-            - This regex is specified at GS1 website
-        '''
         return r'^%s([\x21-\x22\x25-\x2F\x30-\x39\x3A-\x3F\x41-\x5A\x5F\x61-\x7A]{0,%s})' % (cls.data_delimiter, cls.data_size)
 
 
 class GS1DateField(IField):
     '''GS1 Date Field'''
 
-    def __init__(self, agency: Agency, value: int) -> None:
-        self.agency = agency
+    def __init__(self, value: int = None) -> None:
+        self.agency = Agency.GS1
         self.value = value
 
     @classmethod
@@ -48,8 +42,8 @@ class GS1DateField(IField):
 class GS1NumericField(IField):
     '''GS1 Numeric Field'''
 
-    def __init__(self, agency: Agency, value: int) -> None:
-        self.agency = agency
+    def __init__(self, value: int = None) -> None:
+        self.agency = Agency.GS1
         self.value = value
 
     @classmethod
@@ -65,8 +59,7 @@ class GS1NumericField(IField):
 class SSCCField(GS1NumericField):
     '''00 Serial Shipping Container Code (SSCC)'''
 
-    agency: Agency = Agency.GS1
-    name = 'SSCC'
+    name = Identifiers.SSCC
     data_delimiter = '00'
     data_size = 18
 
@@ -74,8 +67,7 @@ class SSCCField(GS1NumericField):
 class GTINField(GS1NumericField):
     '''01 Global Trade Item Number (GTIN)'''
 
-    agency: Agency = Agency.GS1
-    name = 'GTIN'
+    name = Identifiers.GTIN
     data_delimiter = '01'
     data_size = 14
 
@@ -83,8 +75,7 @@ class GTINField(GS1NumericField):
 class ContentField(GS1NumericField):
     '''02 Global Trade Item Number (GTIN) of contained trade items'''
 
-    agency: Agency = Agency.GS1
-    name = 'CONTENT'
+    name = Identifiers.CONTENT
     data_delimiter = '02'
     data_size = 14
 
@@ -92,8 +83,7 @@ class ContentField(GS1NumericField):
 class BatchLotField(GS1AlphanumericField):
     '''10 Batch or lot number'''
 
-    agency: Agency = Agency.GS1
-    name = 'BATCH_LOT'
+    name = Identifiers.BATCH_LOT
     data_delimiter = '10'
     data_size = 20
 
@@ -101,8 +91,7 @@ class BatchLotField(GS1AlphanumericField):
 class ProductionDateField(GS1DateField):
     '''11 Production date (YYMMDD)'''
 
-    agency: Agency = Agency.GS1
-    name = 'PROD_DATE'
+    name = Identifiers.PROD_DATE
     data_delimiter = '11'
     data_size = 6
 
@@ -110,8 +99,7 @@ class ProductionDateField(GS1DateField):
 class ExpiringDateField(GS1DateField):
     '''12 Due date (YYMMDD)'''
 
-    agency: Agency = Agency.GS1
-    name = 'DUE_DATE'
+    name = Identifiers.DUE_DATE
     data_delimiter = '12'
     data_size = 6
 
@@ -119,8 +107,7 @@ class ExpiringDateField(GS1DateField):
 class PackingDateField(GS1DateField):
     '''13 Packaging date (YYMMDD)'''
 
-    agency: Agency = Agency.GS1
-    name = 'PACK_DATE'
+    name = Identifiers.PACK_DATE
     data_delimiter = '13'
     data_size = 6
 
@@ -128,8 +115,7 @@ class PackingDateField(GS1DateField):
 class MinimalExpiringField(GS1DateField):
     '''15 Best before date (YYMMDD)'''
 
-    agency: Agency = Agency.GS1
-    name = 'BEST_BEFORE_OR_BEST_BY'
+    name = Identifiers.BEST_BEFORE_OR_BEST_BY
     data_delimiter = '15'
     data_size = 6
 
@@ -137,8 +123,7 @@ class MinimalExpiringField(GS1DateField):
 class SellExpiringField(GS1DateField):
     '''16 Sell by date (YYMMDD)'''
 
-    agency: Agency = Agency.GS1
-    name = 'SELL_BY'
+    name = Identifiers.SELL_BY
     data_delimiter = '16'
     data_size = 6
 
@@ -146,8 +131,7 @@ class SellExpiringField(GS1DateField):
 class MaxExpiringDateField(GS1DateField):
     '''17 Expiration date (YYMMDD)'''
 
-    agency: Agency = Agency.GS1
-    name = 'USE_BY_OR_EXPIRY'
+    name = Identifiers.USE_BY_OR_EXPIRY
     data_delimiter = '17'
     data_size = 6
 
@@ -155,8 +139,7 @@ class MaxExpiringDateField(GS1DateField):
 class InternalProductVariantField(GS1NumericField):
     '''20 Internal product variant'''
 
-    agency: Agency = Agency.GS1
-    name = 'VARIANT'
+    name = Identifiers.VARIANT
     data_delimiter = '20'
     data_size = 2
 
@@ -164,8 +147,7 @@ class InternalProductVariantField(GS1NumericField):
 class SerialNumberField(GS1AlphanumericField):
     '''21 Serial number'''
 
-    agency: Agency = Agency.GS1
-    name = 'SERIAL'
+    name = Identifiers.SERIAL
     data_delimiter = '21'
     data_size = 20
 
@@ -173,51 +155,76 @@ class SerialNumberField(GS1AlphanumericField):
 class ConsumerProductVariantField(GS1AlphanumericField):
     '''21 Serial number'''
 
-    agency: Agency = Agency.GS1
-    name = 'CPV'
+    name = Identifiers.CPV
     data_delimiter = '22'
     data_size = 20
 
 
-@dataclass
-class GS1Fieldset(IFieldset):
-    '''Represent a container with GS1 Fields'''
+class Gs1Parser(IParser):
+    '''Parses and serializes GS1 Fields'''
 
-    SSCCField: SSCCField = None
-    GTINField: GTINField = None
-    ContentField: ContentField = None
-    BatchLotField: BatchLotField = None
-    ProductionDateField: ProductionDateField = None
-    ExpiringDateField: ExpiringDateField = None
-    PackingDateField: PackingDateField = None
-    MinimalExpiringField: MinimalExpiringField = None
-    SellExpiringField: SellExpiringField = None
-    MaxExpiringDateField: MaxExpiringDateField = None
-    InternalProductVariantField: InternalProductVariantField = None
-    SerialNumberField: SerialNumberField = None
-    ConsumerProductVariantField: ConsumerProductVariantField = None
+    def __init__(self, fieldset_object: IFieldset):
+        self.fieldset_object = fieldset_object
 
-    __fieldset__: list[str] = [
-        'SSCCField', 'GTINField', 'ContentField', 'BatchLotField', 'ProductionDateField', 
-        'ExpiringDateField', 'PackingDateField', 'MinimalExpiringField', 'SellExpiringField', 
-        'MaxExpiringDateField', 'InternalProductVariantField', 'SerialNumberField', 'ConsumerProductVariantField'
-    ]
+    def _parse_from_udi(self, database_str: str) -> None:
+        '''Parse from UDI code'''
+        for chunk_str in database_str.split('\x1d'):
+            
+            for identifier_name, identifier_class in self.fieldset_object.fields.items():
+                result = re.match(identifier_class.regex(), chunk_str)
+                
+                if result:
+                    setattr(self.fieldset_object, identifier_name, identifier_class(result[0]))
+                    break  # break the second loop. move to next <chunk_str>
 
-    def parse(self, database_str: str) -> None:
+    def _parse_from_parameters(self, **kwargs) -> None:
+        '''Parse from kwarg parameters'''
+        supplied_parameters = kwargs.keys()
+        for identifier_name, identifier_class in self.fieldset_object.fields.items():
+            if identifier_name in supplied_parameters:
+                setattr(self.fieldset_object, identifier_name, identifier_class(kwargs[identifier_name]))
+
+
+    def parse(self, database_str: str = None, **kwargs) -> None:
         '''Waiting for more information from GS1 on how to parse'''
-        pass
+        if database_str:
+            self._parse_from_udi(database_str)
+        else:
+            self._parse_from_parameters(**kwargs)
+
 
     def serialize(self, human_readable=False) -> str:
         '''Transform fields in UDI code. Human readable will make it formated'''
-        
+
         udi = ''
 
         if human_readable:
             for field in self.get_fields(show_empty=False):
                 udi += '(' + field.data_delimeter + ')' + field.value
-        
+
         else:
             for field in self.get_fields(show_empty=False):
-                udi += field.data_delimiter + field.value
+                udi += '\x1d' + field.data_delimiter + field.value
 
         return udi
+
+
+class GS1Fieldset(IFieldset):
+    '''Represent a container with GS1 Fields'''
+
+    def __init__(self, *args, **kwargs):
+
+        # Identifier Class for GS1
+        self.fields = {
+            'SSCC':SSCCField, 'GTIN':GTINField, 'CONTENT':ContentField, 'BATCH_LOT':BatchLotField, 
+            'PROD_DATE':ProductionDateField, 'DUE_DATE':ExpiringDateField, 'PACK_DATE':PackingDateField,
+            'BEST_BEFORE_OR_BEST_BY':MinimalExpiringField, 'SELL_BY':SellExpiringField, 'USE_BY_OR_EXPIRY':MaxExpiringDateField,
+            'VARIANT':InternalProductVariantField, 'SERIAL':SerialNumberField, 'CPV':ConsumerProductVariantField
+        }
+
+        # Initialize Fields
+        self.initialize_fields()
+
+        # Parse user parameters to fields
+        self.parser = Gs1Parser(self)
+        self.parser.parse(*args, **kwargs)
