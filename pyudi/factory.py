@@ -1,7 +1,8 @@
 from typing import Any
 from pyudi.common import Agency
 from pyudi.udi.gs1 import StructureGS1
-from pyudi.fields.gs1 import GS1Fieldset
+from pyudi.fields.gs1 import *
+
 
 class FactoryUDI:
     '''UDI Factory'''
@@ -11,8 +12,7 @@ class FactoryUDI:
         '''Create UDI instance our of fields'''
         
         if agency == Agency.GS1:
-            instance = StructureGS1()
-            StructureGS1.fieldset = GS1Fieldset(**kwargs)
+            instance = StructureGS1(**kwargs)
         
         elif agency == Agency.HIBCC:
             raise NotImplementedError
@@ -27,14 +27,12 @@ class FactoryUDI:
         '''Create UDI instance out of a database string'''
 
         if agency == Agency.GS1:
-            structure = StructureGS1()
+            structure = StructureGS1(database_field=database_field)
         
         elif agency == Agency.HIBCC:
             raise NotImplementedError
         
         elif agency == Agency.ICCBBA:
             raise NotImplementedError
-       
-        structure.fieldset.parse(database_str=database_field)
-        
+              
         return structure
