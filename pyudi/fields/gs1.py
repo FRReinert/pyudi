@@ -194,7 +194,7 @@ class Gs1Parser(IParser):
 
 
     def serialize(self, human_readable=False) -> str:
-        '''Transform fields in UDI code. Human readable will make it formated'''
+        '''Transform fields in UDI code'''
 
         udi = ''
 
