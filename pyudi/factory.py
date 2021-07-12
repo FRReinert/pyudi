@@ -27,7 +27,7 @@ class FactoryUDI:
         '''Create UDI instance out of a database string'''
 
         if agency == Agency.GS1:
-            structure = StructureGS1(database_field=database_field)
+            instance = StructureGS1(database_field=database_field, delimiter=delimiter)
         
         elif agency == Agency.HIBCC:
             raise NotImplementedError
@@ -35,4 +35,4 @@ class FactoryUDI:
         elif agency == Agency.ICCBBA:
             raise NotImplementedError
               
-        return structure
+        return instance
