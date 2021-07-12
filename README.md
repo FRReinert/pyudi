@@ -6,47 +6,64 @@ Status: Not ready for production
 
 # Description
 
-This library is designed support UDI patterns and standards in python projects as agnostic as possible. Meaning you can use it with a framework, script, modules or even another library.
+An agnostic UDI library designed to support multiple UDI patterns (GS1, HIBCC, ICCBA...)
 
-GS1 Reference: https://www.gs1.org/standards/barcodes/application-identifiers?lang=en
+# Status
 
-# Usage
+Under development.
 
-We are planning to publish it when when it become production ready. Until there, you can clone it and start playing arround with the library.
+# Goals of this project
 
-# Goals
-
-* Serialization
-
-```python
-from pyudi.udi import UDIPatternGS1
-
-UDI = UDIPatternGS1('010082700200511217000004101234218234')
-print(UDI)
-# {"Device Identifier": "00827002005112", "Expiration Date": '000004' ... }
-
-print(UDI.expiration_date)
-# 000004
-```` 
-
-* Deserialization
+## Parse UDI codes
 ```py
-UDI = UDIPatternGS1()
-UDI.expiration_date = '000004'
-UDI.device_identifier = '00827002005112'
+from pyudi.common import Agency
+from pyudi.factory import FactoryUDI
 
-print(UDI.human_readable_string)
-# (01)00827002005112(17)000004
+label_one = FactoryUDI.make_udi(Agency.GS1, SSCC='0844525700', BATCH_LOT='3110210523790', SERIAL='7260112')
 
-print(UDI.barcode_string)
-# 010082700200511217000004
+label_two = FactoryUDI.make_udi_by_parse(Agency.GS1, '000844525700103110210523790217260112')
 ```
 
-* Validation
+## Serialize an instance
 
 ```python
-UDI = UDIPatternGS1('010082700200511217000004101234218234')
-UDI.validate()
-# ValidationError('000004' is not a valid Date YYMMDD')
-...  
+from pyudi.common import Agency
+from pyudi.factory import FactoryUDI
+
+label = FactoryUDI.make_udi(Agency.GS1, SSCC='0844525700', BATCH_LOT='3110210523790', SERIAL='7260112')
+
+label.fieldset.parser.serialize(human_readable=True)
+# >> (00)0844525700(10)3110210523790(21)7260112
+
+label.fieldset.parser.serialize(human_readable=False)
+# >> \x1d000844525700\x1d103110210523790\x1d217260112
+# 0x1D is the Data Delimiter
+```
+
+## Validate fields
+
+```python
+from pyudi.common import Agency
+from pyudi.factory import FactoryUDI
+
+label = FactoryUDI.make_udi(Agency.GS1, GTIN='7890844525700', BATCH_LOT='000001', SERIAL='7260ZZZ')
+
+label.fieldset.validate()
+# Exception('GTIN: Too many chars') ...
+```
+
+## Request Info from web
+
+```python
+from pyudi.common import Agency
+from pyudi.factory import FactoryUDI
+
+label = FactoryUDI.make_udi(Agency.GS1, GTIN='7890844525700', BATCH_LOT='000001', SERIAL='7260ZZZ')
+
+label.http.to_dict()
+# >> {
+#   'enrollment_link': 'https://www...',
+#   'product_info': '...',
+#   'Manufacturer: '...',
+# } 
 ```
