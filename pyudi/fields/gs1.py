@@ -1,10 +1,11 @@
 '''GS1 fields implementation'''
 
+from pyudi.udi.base import IStructureUDI
 import re
-from typing import Generator
 
-from pyudi.common import Agency, Identifiers
-from pyudi.fields.base import IField, IFieldset, IParser
+from pyudi.common import Agency, Delimiter, Identifiers
+from pyudi.fields.base import Field, IField, IFieldset, IParser
+from pyudi.validators import *
 
 __all__ = ['SSCCField', 'GTINField', 'ContentField', 'BatchLotField', 'ProductionDateField', 'ExpiringDateField',
            'PackingDateField', 'MinimalExpiringField', 'SellExpiringField', 'MaxExpiringDateField',
@@ -15,36 +16,39 @@ __all__ = ['SSCCField', 'GTINField', 'ContentField', 'BatchLotField', 'Productio
 '''
 
 
-class GS1AlphanumericField(IField):
+class GS1AlphanumericField(IField, Field):
     '''Base GS1 Alphanumeric Field'''
 
     def __init__(self, value: str = None) -> None:
         self.agency = Agency.GS1
         self.value = value
+        self.validators = [AllowedCharactersValidator, SizeOverflowValidator, RegexValidator]
 
     @classmethod
     def regex(cls):
         return r'^%s([\x21-\x22\x25-\x2F\x30-\x39\x3A-\x3F\x41-\x5A\x5F\x61-\x7A]{0,%s})' % (cls.data_delimiter, cls.data_size)
 
 
-class GS1DateField(IField):
+class GS1DateField(IField, Field):
     '''GS1 Date Field'''
 
     def __init__(self, value: int = None) -> None:
         self.agency = Agency.GS1
         self.value = value
+        self.validators = [AllowedCharactersValidator, SizeOverflowValidator, FixedSizeValidator, DateValidator, RegexValidator]
 
     @classmethod
     def regex(cls):
         return r'^%s(\d{%s})' % (cls.data_delimiter, cls.data_size)
 
 
-class GS1NumericField(IField):
+class GS1NumericField(IField, Field):
     '''GS1 Numeric Field'''
 
     def __init__(self, value: int = None) -> None:
         self.agency = Agency.GS1
         self.value = value
+        self.validators = [AllowedCharactersValidator, SizeOverflowValidator, FixedSizeValidator, RegexValidator]
 
     @classmethod
     def regex(cls):
@@ -163,19 +167,27 @@ class ConsumerProductVariantField(GS1AlphanumericField):
 class Gs1Parser(IParser):
     '''Parses and serializes GS1 Fields'''
 
-    def __init__(self, fieldset_object: IFieldset):
+    def __init__(self, fieldset_object: IFieldset, delimiter: Delimiter):
         self.fieldset_object = fieldset_object
+        self.delimiter = delimiter
 
     def _parse_from_udi(self, database_str: str) -> None:
         '''Parse from UDI code'''
-        for chunk_str in database_str.split('\x1d'):
-            
-            for identifier_name, identifier_class in self.fieldset_object.fields.items():
-                result = re.match(identifier_class.regex(), chunk_str)
+
+        # FNC1 Delimiter
+        if self.delimiter == Delimiter.FNC1_GS:
+            for chunk_str in database_str.split('\x1d'):
                 
-                if result:
-                    setattr(self.fieldset_object, identifier_name, identifier_class(result[0]))
-                    break  # break the second loop. move to next <chunk_str>
+                for identifier_name, identifier_class in self.fieldset_object.fields.items():
+                    result = re.match(identifier_class.regex(), chunk_str)
+                    
+                    if result:
+                        setattr(self.fieldset_object, identifier_name, identifier_class(result[0]))
+                        break  # break the second loop. move to next <chunk_str>
+        
+        # Field Size delimitation
+        else:
+            pass
 
     def _parse_from_parameters(self, **kwargs) -> None:
         '''Parse from kwarg parameters'''
@@ -212,7 +224,10 @@ class Gs1Parser(IParser):
 class GS1Fieldset(IFieldset):
     '''Represent a container with GS1 Fields'''
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent_structure:IStructureUDI, delimiter: Delimiter, *args, **kwargs):
+
+        # Pointer to parent UDI Structure (not needed yet)
+        self.parent_structure = parent_structure
 
         # Identifier Class for GS1
         self.fields = {
@@ -226,5 +241,5 @@ class GS1Fieldset(IFieldset):
         self.initialize_fields()
 
         # Parse user parameters to fields
-        self.parser = Gs1Parser(self)
+        self.parser = Gs1Parser(self, delimiter=delimiter)
         self.parser.parse(*args, **kwargs)
