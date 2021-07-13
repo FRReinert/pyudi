@@ -1,3 +1,6 @@
+from abc import abstractmethod
+
+
 '''
     This file contain the base abstract class to implement all agencies UDI
     - Do not implement anything that is intrinsict of a single Agency such as GS1
@@ -6,6 +9,11 @@
 
 
 class IStructureUDI:
+    '''UDI Structure interface'''
+    pass
+
+
+class StructureUDI:
     '''Base class for UDI implementation instance'''
 
     __iter_collection: list = []

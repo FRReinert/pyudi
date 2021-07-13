@@ -2,7 +2,9 @@
 
 from abc import ABC, abstractclassmethod, abstractmethod
 from typing import Generator
+from pyudi import validators
 from pyudi.common import Agency
+from pyudi.validators import IValidator
 
 
 class IField(ABC):
@@ -20,8 +22,17 @@ class IField(ABC):
         '''Regex Interface implementation'''
         pass
 
+
+class Field:
+
+    validators: list[IValidator]
+
     def __str__(self):
         return self.value
+
+    def validate(self, *args, **kwargs):
+        for validator in self.validators:
+            validator.validate()
 
 
 class IParser(ABC):

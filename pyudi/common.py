@@ -9,6 +9,21 @@ class Agency(Enum):
     ICCBBA = 3
 
 
+class Delimiter(Enum):
+    '''Field Delimiter'''
+    AUTO = 1
+    FNC1_GS = 2
+    AI_SIZE = 3
+
+
+class GS1Signiature(Enum):
+    '''GS1 Prefix Signiature'''
+    GS1_DATAMATRIX_SEQUENCE = ']d2'
+    GS1_QRCODE_SEQUENCE = ']Q3'
+    GS1_EAN_SEQUENCE = ']e0'
+    GS1_128_SEQUENCE = ']C1'
+
+
 class Identifiers(Enum):
     '''Supported UDI Identifiers'''
 
