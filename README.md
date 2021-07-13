@@ -1,7 +1,7 @@
 ---
-Project: UDI Serialization Library for Python
-Author: Fabricio Roberto Reinert <fabricio.reinert@live.com>
-Status: Not ready for production
+Project: UDI Library for Python
+Author: Fabricio R. Reinert <fabricio.reinert@live.com>
+Status: Under Development
 ---
 
 # Description
