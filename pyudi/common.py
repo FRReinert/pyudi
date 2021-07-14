@@ -2,6 +2,7 @@ from enum import Enum
 from collections import namedtuple
 
 GS1_GS = '\x1d'
+LabelType = namedtuple("LabelType", "agency fnc1 gs")
 
 
 class Agency(Enum):
@@ -12,15 +13,7 @@ class Agency(Enum):
     ICCBBA = 3
 
 
-_label = namedtuple("Label", "agency fnc1 gs")
-class Label(Enum):
-    GS1_DATAMATRIX = _label(Agency.GS1, ']D2', '\x1d')
-    GS1_QRCODE = _label(Agency.GS1, ']Q3', '\x1d')
-    GS1_EAN = _label(Agency.GS1, ']E0', '\x1d')
-    GS1_128 = _label(Agency.GS1, ']C1', '\x1d')
-
-
-class Identifiers(Enum):
+class Identifiers:
     '''Supported UDI AIs'''
 
     SSCC = 'SSCC'
@@ -36,3 +29,10 @@ class Identifiers(Enum):
     VARIANT = 'VARIANT'
     SERIAL = 'SERIAL'
     CPV = 'CPV'
+
+
+class Label:
+    GS1_DATAMATRIX = LabelType(Agency.GS1, ']D2', '\x1d')
+    GS1_QRCODE = LabelType(Agency.GS1, ']Q3', '\x1d')
+    GS1_EAN = LabelType(Agency.GS1, ']E0', '\x1d')
+    GS1_128 = LabelType(Agency.GS1, ']C1', '\x1d')

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generator
+from typing import Iterator
 from pyudi.common import Label
 
 
@@ -7,16 +7,21 @@ class IParser(ABC):
     '''UDI Parser Interface'''
 
     @abstractmethod
-    def parse_from_barcode(self, label: Label, database_str: str, available_fields: list) -> Generator:
+    def parse_from_barcode(self, label: Label, database_str: str, available_fields: list) -> Iterator:
         '''Pase from UDI code from barcode'''
         pass
 
     @abstractmethod
-    def parse_from_parameters(self, **kwargs) -> Generator:
+    def parse_from_parameters(self, **kwargs) -> Iterator:
         '''Parse UDI from function parameters'''
         pass
 
     @abstractmethod
-    def serialize(self, label: Label, human_readable: bool) -> str:
-        '''Serialize a UDI instance to exportable format'''
+    def serialize_to_human_readable_str(self) -> str:
+        '''Serialize a UDI instance to human readable format'''
+        pass
+
+    @abstractmethod
+    def serialize_to_barcode_str(self, label: Label) -> str:
+        '''Serialize a UDI instance to barcode format'''
         pass

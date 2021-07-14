@@ -11,7 +11,6 @@ class FixedSizeError(ValidationExeption):
     def __init__(self, field, value, fixed_size):
         self.message = f'Bad value "{value}" for field <{field}>. It should have a fixed size of {fixed_size}'
 
-
 class SizeOverflowError(ValidationExeption):
     '''Exception when size is higher then it should'''
     def __init__(self, field, value, max_size):

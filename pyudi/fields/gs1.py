@@ -1,14 +1,12 @@
 '''GS1 fields implementation'''
 
-from typing import Generator
-
-from pyudi.common import Agency, Identifiers, Label, GS1_GS
-from pyudi.fields.base import Field, IField, IFieldset, IParser
+from pyudi.common import Agency, Identifiers
+from pyudi.fields.base import Field, IField
 from pyudi.validators import *
 
 __all__ = ['SSCCField', 'GTINField', 'ContentField', 'BatchLotField', 'ProductionDateField', 'ExpiringDateField',
            'PackingDateField', 'MinimalExpiringField', 'SellExpiringField', 'MaxExpiringDateField',
-           'InternalProductVariantField', 'SerialNumberField', 'ConsumerProductVariantField', 'GS1Fieldset']
+           'InternalProductVariantField', 'SerialNumberField', 'ConsumerProductVariantField',]
 
 '''
     Generic GS1 Fields

@@ -1,8 +1,6 @@
 '''Field Factory'''
 
-from abc import ABC, abstractclassmethod, abstractmethod
-from typing import Generator
-from pyudi import validators
+from abc import ABC, abstractclassmethod
 from pyudi.common import Agency
 from pyudi.validators import IValidator
 

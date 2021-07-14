@@ -33,6 +33,8 @@ from pyudi.common import Agency, Label
 from pyudi.factory import FactoryUDI
 
 label = FactoryUDI.make_udi(Agency.GS1)
+label.parse(SSCC='0844525700', BATCH_LOT='3110210523790', SERIAL='7260112')
+
 label.serialize(human_readable=True)
 # >> (00)0844525700(10)3110210523790(21)7260112
 
@@ -49,8 +51,8 @@ from pyudi.factory import FactoryUDI
 label = FactoryUDI.make_udi(Agency.GS1)
 label.parse(GTIN='7890844525700', BATCH_LOT='000001', SERIAL='7260ZZZ')
 
-label.fieldset.validate()
-# Exception('GTIN: Too many chars') ...
+# Exception: FixedSizeError
+#   'GTIN' should have a fixed size of 14 chars
 ```
 
 ## Request Info from web

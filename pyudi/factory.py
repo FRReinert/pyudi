@@ -1,5 +1,5 @@
 from typing import Any
-from pyudi.common import Agency, Delimiter
+from pyudi.common import Agency
 from pyudi.udi.gs1 import StructureGS1
 from pyudi.udi.base import IStructureUDI
 from pyudi.fields.gs1 import *
