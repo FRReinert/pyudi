@@ -16,14 +16,18 @@ Under development.
 
 ## Parse UDI codes
 ```py
-from pyudi.common import Agency
+from pyudi.common import Agency, Label
 from pyudi.factory import FactoryUDI
 
 label_one = FactoryUDI.make_udi(Agency.GS1)
 label_one.parse(SSCC='0844525700', BATCH_LOT='3110210523790', SERIAL='7260112')
 
 label_two = FactoryUDI.make_udi(Agency.GS1)
-label_two.parse('000844525700103110210523790217260112')
+
+# Depending on your barcode reader
+# It can be represented in some of those formats
+label_two.parse('000844525700<GS>103110210523790<GS>217260112', Label.GS1_DATAMATRIX)
+label_two.parse(']d2000844525700<GS>103110210523790<GS>217260112', Label.GS1_DATAMATRIX)
 ```
 
 ## Serialize an instance
@@ -36,10 +40,10 @@ label = FactoryUDI.make_udi(Agency.GS1)
 label.parse(SSCC='0844525700', BATCH_LOT='3110210523790', SERIAL='7260112')
 
 label.serialize(human_readable=True)
-# >> (00)0844525700(10)3110210523790(21)7260112
+# >> '(00)0844525700(10)3110210523790(21)7260112'
 
 label.serialize(label=Label.GS1_DATAMATRIX, human_readable=False)
-# >> ]d2000844525700\x1d103110210523790\x1d217260112
+# >> ']d2000844525700\x1d103110210523790\x1d217260112'
 ```
 
 ## Validate fields

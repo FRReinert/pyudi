@@ -20,7 +20,7 @@ class Gs1Parser(IParser):
         # Split variable and fixed size fields
         # The 1st element will be the fixed size fields
         # the others are variable size fields
-        barcode_split = barcode_wt_fnc1.split(label.gs)
+        barcode_split = barcode_wt_fnc1.split(label.gs_read_char)
         barcode_fixed_fields = barcode_split[0]
         barcode_var_fields = barcode_split[1:]
 
@@ -109,10 +109,10 @@ class Gs1Parser(IParser):
             udi +=  field.data_delimiter + field.value
 
         for field in variable_fields:
-            udi += field.data_delimiter + field.value + label.gs
+            udi += field.data_delimiter + field.value + label.gs_write_char
 
         # Remove <GS> from last field
-        if udi[-1] == label.gs:
+        if udi[-1] == label.gs_write_char:
             udi = udi[:-1]
 
         return udi

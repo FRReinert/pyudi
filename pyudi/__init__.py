@@ -22,6 +22,6 @@ if __name__ == '__main__':
 
     # Example 2
     gs1_ex3 = FactoryUDI.make_udi(Agency.GS1)
-    gs1_ex3.parse(Label.GS1_DATAMATRIX, '010844525700\x1d217260112\x1d103110210523790')
+    gs1_ex3.parse(Label.GS1_DATAMATRIX, '010844525700<GS>217260112<GS>103110210523790')
 
     print("D0ne")
