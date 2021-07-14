@@ -17,11 +17,8 @@ if __name__ == '__main__':
     from pyudi.factory import FactoryUDI
 
     # Example 1
-    gs1_ex2 = FactoryUDI.make_udi(Agency.GS1)
-    gs1_ex2.parse(SSCC='0844525700', BATCH_LOT='3110210523790', SERIAL='7260112')
-
-    # Example 2
-    gs1_ex3 = FactoryUDI.make_udi(Agency.GS1)
-    gs1_ex3.parse(Label.GS1_DATAMATRIX, '010844525700<GS>217260112<GS>103110210523790')
-
-    print("D0ne")
+    gs1 = FactoryUDI.make_udi(Agency.GS1)
+    gs1.parse(GTIN='07897990308239', BATCH_LOT='3110210523790', SERIAL='7260112')
+    
+    print(gs1.serialize(label=Label.GS1_DATAMATRIX, human_readable=False))
+    print(gs1.serialize(label=Label.GS1_DATAMATRIX, human_readable=True))

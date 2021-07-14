@@ -86,33 +86,3 @@ class Gs1Parser(IParser):
                 # TODO: Run validations here!
 
                 yield field_obj
-
-    def serialize_to_human_readable_str(self, fixed_fields: Iterator[IField], variable_fields: Iterator[IField]) -> str:
-        '''Transform fields in UDI code'''
-
-        udi = str()
-
-        for field in fixed_fields:
-            udi += '(' + field.data_delimeter + ')' + field.value
-
-        for field in variable_fields:
-            udi += '(' + field.data_delimeter + ')' + field.value
-
-        return udi
-
-    def serialize_to_barcode_str(self, label: Label, fixed_fields: Iterator[IField], variable_fields: Iterator[IField]) -> str:
-        '''Transform fields in UDI code'''
-
-        udi = label.fnc1
-
-        for field in fixed_fields:
-            udi +=  field.data_delimiter + field.value
-
-        for field in variable_fields:
-            udi += field.data_delimiter + field.value + label.gs_write_char
-
-        # Remove <GS> from last field
-        if udi[-1] == label.gs_write_char:
-            udi = udi[:-1]
-
-        return udi

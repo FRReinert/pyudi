@@ -16,3 +16,4 @@ class GS1Fieldset(IFieldset, Fieldset):
 
         # Initialize Fields with null value
         self.initialize_fields()
+        print()

@@ -16,7 +16,7 @@ __all__ = ['SSCCField', 'GTINField', 'ContentField', 'BatchLotField', 'Productio
 class GS1AlphanumericField(IField, Field):
     '''Base GS1 Alphanumeric Field'''
 
-    def __init__(self, value: str = None) -> None:
+    def __init__(self, value: str = '') -> None:
         self.agency = Agency.GS1
         self.value = value
         self.validators = [AllowedCharactersValidator, SizeOverflowValidator, RegexValidator]
@@ -29,7 +29,7 @@ class GS1AlphanumericField(IField, Field):
 class GS1DateField(IField, Field):
     '''GS1 Date Field'''
 
-    def __init__(self, value: int = None) -> None:
+    def __init__(self, value: int = 0) -> None:
         self.agency = Agency.GS1
         self.value = value
         self.validators = [AllowedCharactersValidator, SizeOverflowValidator, FixedSizeValidator, DateValidator, RegexValidator]
@@ -42,7 +42,7 @@ class GS1DateField(IField, Field):
 class GS1NumericField(IField, Field):
     '''GS1 Numeric Field'''
 
-    def __init__(self, value: int = None) -> None:
+    def __init__(self, value: int = 0) -> None:
         self.agency = Agency.GS1
         self.value = value
         self.validators = [AllowedCharactersValidator, SizeOverflowValidator, FixedSizeValidator, RegexValidator]

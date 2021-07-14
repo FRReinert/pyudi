@@ -22,7 +22,7 @@ class IStructureUDI:
         pass
 
     @abstractmethod
-    def serialize(self, label: Label, human_readable=bool) -> str:
+    def serialize(self, label: Label, human_readable: bool) -> str:
         '''Serialize an UDI instance to string'''
         pass
 

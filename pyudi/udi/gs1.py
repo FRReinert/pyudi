@@ -2,15 +2,16 @@ from pyudi.common import Agency, Label
 from pyudi.fieldsets.gs1 import GS1Fieldset
 from pyudi.parsers.gs1 import Gs1Parser
 from pyudi.udi.base import StructureUDI, IStructureUDI
-
+from pyudi.serializers.gs1 import Gs1Serializer
 
 class StructureGS1(StructureUDI, IStructureUDI):
     '''GS1 UDI Representation'''
 
     def __init__(self) -> None:
-        self.agency = Agency.GS1
-        self.fieldset = GS1Fieldset()
-        self.parser = Gs1Parser()
+        self.agency: Agency = Agency.GS1
+        self.fieldset: GS1Fieldset = GS1Fieldset()
+        self.serializer: Gs1Serializer = Gs1Serializer()
+        self.parser: Gs1Parser = Gs1Parser()
     
     def parse(self, database_str: str = None, label: Label = None, **kwargs) -> None:
         '''Parsing fields into composed fieldset object'''
@@ -37,9 +38,9 @@ class StructureGS1(StructureUDI, IStructureUDI):
         variable_size_fields = self.fieldset.get_variable_size_fields(show_empty_fields=False)
 
         if human_readable:
-            serialized = self.parser.serialize_to_human_readable_str(fixed_size_fields, variable_size_fields)
+            serialized = self.serializer.serialize_to_human_readable_str(fixed_size_fields, variable_size_fields)
         
         else:
-            serialized = self.parser.serialize_to_barcode_str(fixed_size_fields, variable_size_fields)
+            serialized = self.serializer.serialize_to_barcode_str(label, fixed_size_fields, variable_size_fields)
         
         return serialized

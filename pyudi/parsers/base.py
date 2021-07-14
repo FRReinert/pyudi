@@ -15,13 +15,3 @@ class IParser(ABC):
     def parse_from_parameters(self, **kwargs) -> Iterator:
         '''Parse UDI from function parameters'''
         pass
-
-    @abstractmethod
-    def serialize_to_human_readable_str(self) -> str:
-        '''Serialize a UDI instance to human readable format'''
-        pass
-
-    @abstractmethod
-    def serialize_to_barcode_str(self, label: Label) -> str:
-        '''Serialize a UDI instance to barcode format'''
-        pass
