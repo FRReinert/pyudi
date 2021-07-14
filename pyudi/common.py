@@ -1,4 +1,7 @@
 from enum import Enum
+from collections import namedtuple
+
+GS1_GS = '\x1d'
 
 
 class Agency(Enum):
@@ -9,23 +12,16 @@ class Agency(Enum):
     ICCBBA = 3
 
 
-class Delimiter(Enum):
-    '''Field Delimiter'''
-    AUTO = 1
-    FNC1_GS = 2
-    AI_SIZE = 3
-
-
-class GS1Signiature(Enum):
-    '''GS1 Prefix Signiature'''
-    GS1_DATAMATRIX_SEQUENCE = ']d2'
-    GS1_QRCODE_SEQUENCE = ']Q3'
-    GS1_EAN_SEQUENCE = ']e0'
-    GS1_128_SEQUENCE = ']C1'
+_label = namedtuple("Label", "agency fnc1 gs")
+class Label(Enum):
+    GS1_DATAMATRIX = _label(Agency.GS1, ']D2', '\x1d')
+    GS1_QRCODE = _label(Agency.GS1, ']Q3', '\x1d')
+    GS1_EAN = _label(Agency.GS1, ']E0', '\x1d')
+    GS1_128 = _label(Agency.GS1, ']C1', '\x1d')
 
 
 class Identifiers(Enum):
-    '''Supported UDI Identifiers'''
+    '''Supported UDI AIs'''
 
     SSCC = 'SSCC'
     GTIN = 'GTIN'

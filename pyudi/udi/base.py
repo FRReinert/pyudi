@@ -1,5 +1,7 @@
 from abc import abstractmethod
-
+from pyudi.common import Agency, Label
+from pyudi.fields.base import IField
+from pyudi.fieldsets.base import IFieldset
 
 '''
     This file contain the base abstract class to implement all agencies UDI
@@ -10,8 +12,19 @@ from abc import abstractmethod
 
 class IStructureUDI:
     '''UDI Structure interface'''
-    pass
+    agency: Agency
+    fieldset: IFieldset
+    parser: IField
 
+    @abstractmethod
+    def parse(self, **kwargs) -> None:
+        '''Parse an UDI string into UDI instance'''
+        pass
+
+    @abstractmethod
+    def serialize(self, label: Label, human_readable=bool) -> str:
+        '''Serialize an UDI instance to string'''
+        pass
 
 class StructureUDI:
     '''Base class for UDI implementation instance'''

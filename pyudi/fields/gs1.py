@@ -1,9 +1,8 @@
 '''GS1 fields implementation'''
 
-from pyudi.udi.base import IStructureUDI
-import re
+from typing import Generator
 
-from pyudi.common import Agency, Delimiter, Identifiers
+from pyudi.common import Agency, Identifiers, Label, GS1_GS
 from pyudi.fields.base import Field, IField, IFieldset, IParser
 from pyudi.validators import *
 
@@ -66,6 +65,7 @@ class SSCCField(GS1NumericField):
     name = Identifiers.SSCC
     data_delimiter = '00'
     data_size = 18
+    fixed_size = True
 
 
 class GTINField(GS1NumericField):
@@ -74,6 +74,7 @@ class GTINField(GS1NumericField):
     name = Identifiers.GTIN
     data_delimiter = '01'
     data_size = 14
+    fixed_size = True
 
 
 class ContentField(GS1NumericField):
@@ -82,6 +83,7 @@ class ContentField(GS1NumericField):
     name = Identifiers.CONTENT
     data_delimiter = '02'
     data_size = 14
+    fixed_size = True
 
 
 class BatchLotField(GS1AlphanumericField):
@@ -90,6 +92,7 @@ class BatchLotField(GS1AlphanumericField):
     name = Identifiers.BATCH_LOT
     data_delimiter = '10'
     data_size = 20
+    fixed_size = False
 
 
 class ProductionDateField(GS1DateField):
@@ -98,6 +101,7 @@ class ProductionDateField(GS1DateField):
     name = Identifiers.PROD_DATE
     data_delimiter = '11'
     data_size = 6
+    fixed_size = True
 
 
 class ExpiringDateField(GS1DateField):
@@ -106,6 +110,7 @@ class ExpiringDateField(GS1DateField):
     name = Identifiers.DUE_DATE
     data_delimiter = '12'
     data_size = 6
+    fixed_size = True
 
 
 class PackingDateField(GS1DateField):
@@ -114,6 +119,7 @@ class PackingDateField(GS1DateField):
     name = Identifiers.PACK_DATE
     data_delimiter = '13'
     data_size = 6
+    fixed_size = True
 
 
 class MinimalExpiringField(GS1DateField):
@@ -122,6 +128,7 @@ class MinimalExpiringField(GS1DateField):
     name = Identifiers.BEST_BEFORE_OR_BEST_BY
     data_delimiter = '15'
     data_size = 6
+    fixed_size = True
 
 
 class SellExpiringField(GS1DateField):
@@ -130,6 +137,7 @@ class SellExpiringField(GS1DateField):
     name = Identifiers.SELL_BY
     data_delimiter = '16'
     data_size = 6
+    fixed_size = True
 
 
 class MaxExpiringDateField(GS1DateField):
@@ -138,6 +146,7 @@ class MaxExpiringDateField(GS1DateField):
     name = Identifiers.USE_BY_OR_EXPIRY
     data_delimiter = '17'
     data_size = 6
+    fixed_size = True
 
 
 class InternalProductVariantField(GS1NumericField):
@@ -146,6 +155,7 @@ class InternalProductVariantField(GS1NumericField):
     name = Identifiers.VARIANT
     data_delimiter = '20'
     data_size = 2
+    fixed_size = True
 
 
 class SerialNumberField(GS1AlphanumericField):
@@ -154,6 +164,7 @@ class SerialNumberField(GS1AlphanumericField):
     name = Identifiers.SERIAL
     data_delimiter = '21'
     data_size = 20
+    fixed_size = False
 
 
 class ConsumerProductVariantField(GS1AlphanumericField):
@@ -162,84 +173,4 @@ class ConsumerProductVariantField(GS1AlphanumericField):
     name = Identifiers.CPV
     data_delimiter = '22'
     data_size = 20
-
-
-class Gs1Parser(IParser):
-    '''Parses and serializes GS1 Fields'''
-
-    def __init__(self, fieldset_object: IFieldset, delimiter: Delimiter):
-        self.fieldset_object = fieldset_object
-        self.delimiter = delimiter
-
-    def _parse_from_udi(self, database_str: str) -> None:
-        '''Parse from UDI code'''
-
-        # FNC1 Delimiter
-        if self.delimiter == Delimiter.FNC1_GS:
-            for chunk_str in database_str.split('\x1d'):
-                
-                for identifier_name, identifier_class in self.fieldset_object.fields.items():
-                    result = re.match(identifier_class.regex(), chunk_str)
-                    
-                    if result:
-                        setattr(self.fieldset_object, identifier_name, identifier_class(result[0]))
-                        break  # break the second loop. move to next <chunk_str>
-        
-        # Field Size delimitation
-        else:
-            pass
-
-    def _parse_from_parameters(self, **kwargs) -> None:
-        '''Parse from kwarg parameters'''
-        supplied_parameters = kwargs.keys()
-        for identifier_name, identifier_class in self.fieldset_object.fields.items():
-            if identifier_name in supplied_parameters:
-                setattr(self.fieldset_object, identifier_name, identifier_class(kwargs[identifier_name]))
-
-
-    def parse(self, database_str: str = None, **kwargs) -> None:
-        '''Waiting for more information from GS1 on how to parse'''
-        if database_str:
-            self._parse_from_udi(database_str)
-        else:
-            self._parse_from_parameters(**kwargs)
-
-
-    def serialize(self, human_readable=False) -> str:
-        '''Transform fields in UDI code'''
-
-        udi = ''
-
-        if human_readable:
-            for field in self.get_fields(show_empty=False):
-                udi += '(' + field.data_delimeter + ')' + field.value
-
-        else:
-            for field in self.get_fields(show_empty=False):
-                udi += '\x1d' + field.data_delimiter + field.value
-
-        return udi
-
-
-class GS1Fieldset(IFieldset):
-    '''Represent a container with GS1 Fields'''
-
-    def __init__(self, parent_structure:IStructureUDI, delimiter: Delimiter, *args, **kwargs):
-
-        # Pointer to parent UDI Structure (not needed yet)
-        self.parent_structure = parent_structure
-
-        # Identifier Class for GS1
-        self.fields = {
-            'SSCC':SSCCField, 'GTIN':GTINField, 'CONTENT':ContentField, 'BATCH_LOT':BatchLotField, 
-            'PROD_DATE':ProductionDateField, 'DUE_DATE':ExpiringDateField, 'PACK_DATE':PackingDateField,
-            'BEST_BEFORE_OR_BEST_BY':MinimalExpiringField, 'SELL_BY':SellExpiringField, 'USE_BY_OR_EXPIRY':MaxExpiringDateField,
-            'VARIANT':InternalProductVariantField, 'SERIAL':SerialNumberField, 'CPV':ConsumerProductVariantField
-        }
-
-        # Initialize Fields
-        self.initialize_fields()
-
-        # Parse user parameters to fields
-        self.parser = Gs1Parser(self, delimiter=delimiter)
-        self.parser.parse(*args, **kwargs)
+    fixed_size = False
