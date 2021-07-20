@@ -1,8 +1,5 @@
 from enum import Enum
-from collections import namedtuple
-
-GS1_GS = '\x1d'
-LabelType = namedtuple("LabelType", "agency fnc1 gs_read_char gs_write_char")
+from dataclasses import dataclass
 
 
 class Agency(Enum):
@@ -31,8 +28,17 @@ class Identifiers:
     CPV = 'CPV'
 
 
+@dataclass
+class _LABELTYPE:
+    agency: Agency
+    fnc1_read_char: str
+    fnc1_write_char: str
+    gs_read_char: str
+    gs_write_char: str
+
+
 class Label:
-    GS1_DATAMATRIX = LabelType(Agency.GS1, ']D2', '<GS>', '\x1d')
-    GS1_QRCODE = LabelType(Agency.GS1, ']Q3', '<GS>', '\x1d')
-    GS1_EAN = LabelType(Agency.GS1, ']E0', '<GS>', '\x1d')
-    GS1_128 = LabelType(Agency.GS1, ']C1', '<GS>', '\x1d')
+    GS1_DATAMATRIX = _LABELTYPE(Agency.GS1, ']D2', '\xe8', '<GS>', '\x1d')
+    GS1_QRCODE = _LABELTYPE(Agency.GS1, ']Q3', '', '<GS>', '\x1d')  # TODO: Add ASCII Write FNC1
+    GS1_EAN = _LABELTYPE(Agency.GS1, ']E0', '', '<GS>', '\x1d')  # TODO: Add ASCII Write FNC1
+    GS1_128 = _LABELTYPE(Agency.GS1, ']C1', '', '<GS>', '\x1d')  # TODO: Add ASCII Write FNC1

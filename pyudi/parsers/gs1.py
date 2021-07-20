@@ -12,8 +12,8 @@ class Gs1Parser(IParser):
         '''Parse from UDI code'''
 
         # Remove FNC1
-        if database_str.startswith(label.fnc1):
-            barcode_wt_fnc1 = database_str.split(label.fnc1)[1]
+        if database_str.startswith(label.fnc1_read_char):
+            barcode_wt_fnc1 = database_str.split(label.fnc1_read_char)[1]
         else:
             barcode_wt_fnc1 = database_str
 
