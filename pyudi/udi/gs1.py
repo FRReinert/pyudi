@@ -18,7 +18,7 @@ class StructureGS1(StructureUDI, IStructureUDI):
 
         if database_str:
             if label == None:
-                raise TypeError('Missing required parameter <Label>')
+                raise TypeError('Missing required parameter "Label"')
 
             for field_instance in self.parser.parse_from_barcode(label, database_str, self.fieldset):
                 setattr(self.fieldset, field_instance.name, field_instance)

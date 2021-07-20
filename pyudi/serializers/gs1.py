@@ -1,7 +1,7 @@
 from pyudi.serializers.base import ISerializer
 from pyudi.common import Label
 from pyudi.fields.base import IField
-from typing import Iterable, Iterator
+from typing import Iterable
 
 
 class Gs1Serializer(ISerializer):

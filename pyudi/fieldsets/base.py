@@ -5,26 +5,26 @@ from pyudi.fields.base import IField
 
 class IFieldset(ABC):
     '''Field container Interface'''
+    pass
+
+
+class Fieldset:
+    '''Field container basic behaviors'''
 
     def initialize_fields(self) -> None:
         '''Initialize all UDI fields without value'''
         for field_name, field_class in self.fields.items():
             setattr(self, field_name, field_class())
 
-
-class Fieldset:
-    '''Field container basic behaviors'''
-
-    def get_fixed_size_fields(self, show_empty_fields: bool=False) -> Iterable[IField]:
-        '''Return only fixed size fields'''
+    def get_fixed_size_fields(self, show_empty_fields: bool = False) -> Iterable[IField]:
+        '''Return fixed size fields'''
 
         # Filter Fixed/Variable size fields
         filtered_field_names = filter(lambda field_name: getattr(self, field_name).fixed_size == True, self.fields.keys())
 
-        # Filter empty/used fields
-        # BUG: Not working, review this code!
+        # Filter empty fields
         if show_empty_fields == False:
-            filtered_field_names = filter(lambda field_name: hasattr(getattr(self, field_name), 'value'), filtered_field_names)
+            filtered_field_names = filter(lambda field_name: True if getattr(self, field_name).value else False, filtered_field_names)
 
         # Apply filter
         return (getattr(self, field) for field in filtered_field_names)
@@ -36,9 +36,8 @@ class Fieldset:
         filtered_field_names = filter(lambda field_name: getattr(self, field_name).fixed_size == False, self.fields.keys())
 
         # Filter empty/used fields
-        # BUG: Not working, review this code!
         if show_empty_fields == False:
-            filtered_field_names = filter(lambda field_name: hasattr(getattr(self, field_name), 'value'), filtered_field_names)
+            filtered_field_names = filter(lambda field_name: True if getattr(self, field_name).value else False, filtered_field_names)
 
         # Apply filter
         return (getattr(self, field) for field in filtered_field_names)
